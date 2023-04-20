@@ -1,7 +1,7 @@
 package telegram.settings;
 
 public enum Status {
-    NONE,
+    DEFAULT,
     NO_SUCH_COMMAND,
     AWAITING_HOST,
     AWAITING_PORT,
