@@ -5,10 +5,22 @@ import org.telegram.telegrambots.meta.api.methods.CopyMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import telegram.commands.*;
+import telegram.settings.Status;
+import telegram.settings.UserConnectionSettings;
+
 public class Bot extends TelegramLongPollingBot {
+
+    private final Map<Long, UserConnectionSettings> userSettings = new HashMap<>();
+    private final Map<Long, Status> userStatus = new HashMap<>();
+    private final CommandRegistry registry = new CommandRegistry();
 
     public Bot(String botToken) {
         super(botToken);
+        fillRegistry();
     }
 
     @Override
@@ -18,11 +30,18 @@ public class Bot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        var msg = update.getMessage();
-        var msgId = msg.getMessageId();
-        var userId = msg.getFrom().getId();
+        var message = update.getMessage();
+        if (!userSettings.containsKey(message.getFrom().getId())) {
+            userSettings.put(message.getFrom().getId(), new UserConnectionSettings());
+        }
+        if (message.isCommand()) {
+            var status = registry.executeCommand(this, message);
+        }
 
-        copyMessage(userId, msgId);
+//        var msg = update.getMessage();
+//        var msgId = msg.getMessageId();
+//        var userId = msg.getFrom().getId();
+//        copyMessage(userId, msgId);
     }
 
     private void copyMessage(Long userId, Integer msgId) {
@@ -36,5 +55,13 @@ public class Bot extends TelegramLongPollingBot {
         } catch (TelegramApiException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private void fillRegistry() {
+        registry.addCommand(new HostCommand());
+        registry.addCommand(new PortCommand());
+        registry.addCommand(new DBNameCommand());
+        registry.addCommand(new UserNameCommand());
+        registry.addCommand(new PasswordCommand());
     }
 }
