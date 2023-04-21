@@ -34,8 +34,6 @@ public class Bot extends TelegramLongPollingBot {
         var message = update.getMessage();
         var userId = message.getFrom().getId();
         initUserSettingsIfNeeded(userId);
-        // todo: delete temp output
-        tempOut(userSettings.get(userId));
         if (message.isCommand()) {
             var status = commandRegistry.executeCommand(this, message);
             if (status == BotStatus.NO_SUCH_COMMAND) {
@@ -69,6 +67,7 @@ public class Bot extends TelegramLongPollingBot {
         commandRegistry.addCommand(new UserNameCommand());
         commandRegistry.addCommand(new PasswordCommand());
         commandRegistry.addCommand(new HelpCommand(commandRegistry));
+        commandRegistry.addCommand(new SQLCommand());
     }
 
     private void fillResponseRegistry() {
@@ -77,6 +76,7 @@ public class Bot extends TelegramLongPollingBot {
         responseRegistry.addResponse(BotStatus.AWAITING_DB_NAME, new SetDBNameResponse());
         responseRegistry.addResponse(BotStatus.AWAITING_USERNAME, new SetUsernameResponse());
         responseRegistry.addResponse(BotStatus.AWAITING_PASSWORD, new SetPasswordResponse());
+        responseRegistry.addResponse(BotStatus.AWAITING_SQL_QUERY, new SQLResponse());
     }
 
     private void initUserSettingsIfNeeded(Long userId) {
