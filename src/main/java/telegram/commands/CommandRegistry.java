@@ -24,14 +24,14 @@ public class CommandRegistry {
     public BotStatus executeCommand(AbsSender absSender, Message message) {
         String name = message.getText().substring(1);
         if (registry.containsKey(name)) {
-            return registry.get(name).execute(absSender, message.getFrom(), message.getChat());
+            return registry.get(name).execute(absSender, message.getChat());
         }
         return BotStatus.NO_SUCH_COMMAND;
     }
 
     public BotStatus executeCommand(AbsSender absSender, Message message, String commandName) {
         if (registry.containsKey(commandName)) {
-            return registry.get(commandName).execute(absSender, message.getFrom(), message.getChat());
+            return registry.get(commandName).execute(absSender, message.getChat());
         }
         return BotStatus.NO_SUCH_COMMAND;
     }
