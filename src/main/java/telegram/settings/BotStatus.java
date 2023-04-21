@@ -1,6 +1,6 @@
 package telegram.settings;
 
-public enum Status {
+public enum BotStatus {
     DEFAULT,
     NO_SUCH_COMMAND,
     AWAITING_HOST,

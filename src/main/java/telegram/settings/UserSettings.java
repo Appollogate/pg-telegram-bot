@@ -1,11 +1,12 @@
 package telegram.settings;
 
-public class UserConnectionSettings {
+public class UserSettings {
     private String host;
     private Integer port;
     private String dbName;
     private String username;
     private String password;
+    private BotStatus botStatus = BotStatus.DEFAULT;
 
     public String getHost() {
         return host;
@@ -45,5 +46,13 @@ public class UserConnectionSettings {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public BotStatus getBotStatus() {
+        return botStatus;
+    }
+
+    public void setBotStatus(BotStatus botStatus) {
+        this.botStatus = botStatus;
     }
 }

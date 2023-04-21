@@ -1,34 +1,10 @@
-package telegram.commands;
+package telegram.responses;
 
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import telegram.Bot;
 
-public abstract class Command implements ICommand {
-    private final String name;
-    private final String description;
-
-    Command(String name, String description) {
-        this.name = name;
-        this.description = description;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public String getDescription() {
-        return description;
-    }
-
-    @Override
-    public String toString() {
-        return "/" + name + " - " + description;
-    }
-
+public abstract class Response implements IResponse {
     void sendMessage(AbsSender absSender, Long chatId, String message) {
         SendMessage sendMessage = SendMessage.builder()
                 .chatId(chatId)

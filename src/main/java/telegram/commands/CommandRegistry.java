@@ -2,7 +2,7 @@ package telegram.commands;
 
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.bots.AbsSender;
-import telegram.settings.Status;
+import telegram.settings.BotStatus;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -21,11 +21,18 @@ public class CommandRegistry {
         return registry.values();
     }
 
-    public Status executeCommand(AbsSender absSender, Message message) {
+    public BotStatus executeCommand(AbsSender absSender, Message message) {
         String name = message.getText().substring(1);
         if (registry.containsKey(name)) {
             return registry.get(name).execute(absSender, message.getFrom(), message.getChat());
         }
-        return Status.NO_SUCH_COMMAND;
+        return BotStatus.NO_SUCH_COMMAND;
+    }
+
+    public BotStatus executeCommand(AbsSender absSender, Message message, String commandName) {
+        if (registry.containsKey(commandName)) {
+            return registry.get(commandName).execute(absSender, message.getFrom(), message.getChat());
+        }
+        return BotStatus.NO_SUCH_COMMAND;
     }
 }

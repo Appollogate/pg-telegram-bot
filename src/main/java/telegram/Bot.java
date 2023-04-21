@@ -1,26 +1,27 @@
 package telegram;
 
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.meta.api.methods.CopyMessage;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import telegram.commands.*;
-import telegram.settings.Status;
-import telegram.settings.UserConnectionSettings;
+import telegram.responses.*;
+import telegram.settings.BotStatus;
+import telegram.settings.UserSettings;
 
 public class Bot extends TelegramLongPollingBot {
 
-    private final Map<Long, UserConnectionSettings> userSettings = new HashMap<>();
-    private final Map<Long, Status> userStatus = new HashMap<>();
-    private final CommandRegistry registry = new CommandRegistry();
+    private final Map<Long, UserSettings> userSettings = new HashMap<>();
+    private final CommandRegistry commandRegistry = new CommandRegistry();
+    private final ResponseRegistry responseRegistry = new ResponseRegistry();
 
     public Bot(String botToken) {
         super(botToken);
-        fillRegistry();
+        fillCommandRegistry();
+        fillResponseRegistry();
     }
 
     @Override
@@ -31,38 +32,60 @@ public class Bot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         var message = update.getMessage();
-        if (!userSettings.containsKey(message.getFrom().getId())) {
-            userSettings.put(message.getFrom().getId(), new UserConnectionSettings());
-        }
+        var userId = message.getFrom().getId();
+        initUserSettingsIfNeeded(userId);
+        // todo: delete temp output
+        System.out.println(userSettings.get(userId));
         if (message.isCommand()) {
-            var status = registry.executeCommand(this, message);
+            var status = commandRegistry.executeCommand(this, message);
+            if (status == BotStatus.NO_SUCH_COMMAND) {
+                executeDefaultAction(message);
+                status = BotStatus.DEFAULT;
+            }
+            userSettings.get(userId).setBotStatus(status);
+            return;
         }
-
-//        var msg = update.getMessage();
-//        var msgId = msg.getMessageId();
-//        var userId = msg.getFrom().getId();
-//        copyMessage(userId, msgId);
+        // handle user text message if waiting for some sort of information
+        if (userSettings.get(userId).getBotStatus() != BotStatus.DEFAULT) {
+            var status = responseRegistry.executeResponse(this, message, userSettings.get(userId).getBotStatus());
+            userSettings.get(userId).setBotStatus(status);
+            return;
+        }
+        // If incoming message is not a command and is not an expected text answer, execute default action
+        executeDefaultAction(message);
     }
 
-    private void copyMessage(Long userId, Integer msgId) {
-        CopyMessage cm = CopyMessage.builder()
-                .fromChatId(userId.toString())
-                .chatId(userId.toString())
-                .messageId(msgId)
-                .build();
-        try {
-            execute(cm); // send the message
-        } catch (TelegramApiException e) {
-            throw new RuntimeException(e);
+    public UserSettings getUserSettings(Long userId) {
+        if (!userSettings.containsKey(userId)) {
+            userSettings.put(userId, new UserSettings());
+        }
+        return userSettings.get(userId);
+    }
+
+    private void fillCommandRegistry() {
+        commandRegistry.addCommand(new HostCommand());
+        commandRegistry.addCommand(new PortCommand());
+        commandRegistry.addCommand(new DBNameCommand());
+        commandRegistry.addCommand(new UserNameCommand());
+        commandRegistry.addCommand(new PasswordCommand());
+        commandRegistry.addCommand(new HelpCommand(commandRegistry));
+    }
+
+    private void fillResponseRegistry() {
+        responseRegistry.addResponse(BotStatus.AWAITING_HOST, new SetHostResponse());
+        responseRegistry.addResponse(BotStatus.AWAITING_PORT, new SetPortResponse());
+        responseRegistry.addResponse(BotStatus.AWAITING_DB_NAME, new SetDBNameResponse());
+        responseRegistry.addResponse(BotStatus.AWAITING_USERNAME, new SetUsernameResponse());
+        responseRegistry.addResponse(BotStatus.AWAITING_PASSWORD, new SetPasswordResponse());
+    }
+
+    private void initUserSettingsIfNeeded(Long userId) {
+        if (!userSettings.containsKey(userId)) {
+            userSettings.put(userId, new UserSettings());
         }
     }
 
-    private void fillRegistry() {
-        registry.addCommand(new HostCommand());
-        registry.addCommand(new PortCommand());
-        registry.addCommand(new DBNameCommand());
-        registry.addCommand(new UserNameCommand());
-        registry.addCommand(new PasswordCommand());
-        registry.addCommand(new HelpCommand(registry));
+    private void executeDefaultAction(Message message) {
+        commandRegistry.executeCommand(this, message, "help");
     }
 }

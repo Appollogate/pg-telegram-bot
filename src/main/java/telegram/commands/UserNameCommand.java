@@ -1,11 +1,8 @@
 package telegram.commands;
 
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Chat;
-import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.bots.AbsSender;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import telegram.settings.Status;
+import telegram.settings.BotStatus;
 
 public class UserNameCommand extends Command {
     public UserNameCommand() {
@@ -13,17 +10,8 @@ public class UserNameCommand extends Command {
     }
 
     @Override
-    public Status execute(AbsSender absSender, User user, Chat chat) {
-        SendMessage message = SendMessage.builder()
-                .chatId(chat.getId())
-                .text(this.toString())
-                .build();
-        try {
-            absSender.execute(message);
-        } catch (TelegramApiException e) {
-            // todo: handle better
-            System.err.println(e.getMessage());
-        }
-        return Status.AWAITING_USERNAME;
+    public BotStatus execute(AbsSender absSender, Chat chat) {
+        sendMessage(absSender, chat.getId(), "Send me the username which will be used for connection.");
+        return BotStatus.AWAITING_USERNAME;
     }
 }
