@@ -1,6 +1,7 @@
 package postgres;
 
 import postgres.data.ConnectionSettings;
+import postgres.data.Table;
 import postgres.jdbc.JDBCSession;
 import utility.PGTelegramBotException;
 
@@ -11,8 +12,7 @@ public class PGController {
         this.connectionSettings = new ConnectionSettings(host, port, dbName, username, password);
     }
 
-    // only meant to support SELECT queries!
-    public String executeSQLQuery(String query) throws PGTelegramBotException {
+    public Table executeSQLQuery(String query) throws PGTelegramBotException {
         JDBCSession session = new JDBCSession(connectionSettings);
         return session.getQueryResult(query);
     }

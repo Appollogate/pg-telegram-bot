@@ -11,12 +11,17 @@ import telegram.commands.*;
 import telegram.responses.*;
 import telegram.settings.BotStatus;
 import telegram.settings.UserSettings;
+import utility.BatchDispatcher;
+import utility.Pair;
 
 public class Bot extends TelegramLongPollingBot {
 
     private final Map<Long, UserSettings> userSettings = new HashMap<>();
     private final CommandRegistry commandRegistry = new CommandRegistry();
     private final ResponseRegistry responseRegistry = new ResponseRegistry();
+    // todo: store this in a database
+    // maps message id + chat id to a batch dispatcher that holds retrieved query
+    private Map<Pair<Integer, Long>, BatchDispatcher> batchDispatcherMap = new HashMap<>();
 
     public Bot(String botToken) {
         super(botToken);
@@ -34,6 +39,10 @@ public class Bot extends TelegramLongPollingBot {
         var message = update.getMessage();
         var userId = message.getFrom().getId();
         initUserSettingsIfNeeded(userId);
+        if (update.hasCallbackQuery()) {
+            // todo: handle inline keyboard
+            return;
+        }
         if (message.isCommand()) {
             var status = commandRegistry.executeCommand(this, message);
             if (status == BotStatus.NO_SUCH_COMMAND) {
@@ -58,6 +67,13 @@ public class Bot extends TelegramLongPollingBot {
             userSettings.put(userId, new UserSettings());
         }
         return userSettings.get(userId);
+    }
+
+    public void setBatchDispatcherForMessage(Integer messageId, Long chatId, BatchDispatcher batchDispatcher) {
+        Pair<Integer, Long> messageChatPair = new Pair<>(messageId, chatId);
+        if (!batchDispatcherMap.containsKey(messageChatPair)) {
+            batchDispatcherMap.put(messageChatPair, batchDispatcher);
+        }
     }
 
     private void fillCommandRegistry() {

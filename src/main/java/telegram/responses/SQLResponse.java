@@ -5,9 +5,13 @@ import postgres.PGController;
 import telegram.Bot;
 import telegram.settings.BotStatus;
 import telegram.settings.UserSettings;
+import utility.BatchDispatcher;
 import utility.PGTelegramBotException;
 
+// todo: rename to QueryResponse
 public class SQLResponse extends Response {
+
+    static final Integer BATCH_SIZE = 5;
 
     @Override
     public BotStatus execute(Bot bot, Message message) {
@@ -46,7 +50,11 @@ public class SQLResponse extends Response {
                 userSettings.getPassword());
         try {
             var result = pgController.executeSQLQuery(sqlQuery);
-            sendMessage(bot, chatId, result);
+            var batchDispatcher = new BatchDispatcher(result, BATCH_SIZE, true, true);
+            // todo: override sendMessage to include left/right buttons to switch batches
+            Message sentMessage = sendMessage(bot, chatId, batchDispatcher.getCurrentBatch());
+            // save BatchDispatcher for this specific message
+            bot.setBatchDispatcherForMessage(sentMessage.getMessageId(), sentMessage.getChat().getId(), batchDispatcher);
         } catch (PGTelegramBotException e) {
             sendMessage(bot, chatId, e.getMessage());
             System.err.println(e.getCause().getMessage());

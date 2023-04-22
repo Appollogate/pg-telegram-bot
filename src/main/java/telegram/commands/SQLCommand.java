@@ -4,6 +4,7 @@ import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 import telegram.settings.BotStatus;
 
+// todo: rename to query command
 public class SQLCommand extends Command {
     public SQLCommand() {
         super("sql", "execute sql query");

@@ -1,6 +1,7 @@
 package postgres.jdbc;
 
 import postgres.data.ConnectionSettings;
+import postgres.data.Table;
 import utility.PGTelegramBotException;
 
 import java.sql.*;
@@ -16,7 +17,7 @@ public class JDBCSession {
         password = settings.password();
     }
 
-    public String getQueryResult(String query) throws PGTelegramBotException {
+    public Table getQueryResult(String query) throws PGTelegramBotException {
         String jdbcDriver = "org.postgresql.Driver";
         try {
             Class.forName(jdbcDriver);
