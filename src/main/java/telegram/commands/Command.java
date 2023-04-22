@@ -26,12 +26,13 @@ public abstract class Command implements ICommand {
 
     @Override
     public String toString() {
-        return "/" + name + " - " + description;
+        return "<b>/" + name + "</b> - " + description;
     }
 
     void sendMessage(AbsSender absSender, Long chatId, String message) {
         SendMessage sendMessage = SendMessage.builder()
                 .chatId(chatId)
+                .parseMode("HTML")
                 .text(message)
                 .build();
         try {

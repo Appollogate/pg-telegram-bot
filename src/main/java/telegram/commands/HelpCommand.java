@@ -14,7 +14,8 @@ public class HelpCommand extends Command {
 
     @Override
     public BotStatus execute(AbsSender absSender, Chat chat) {
-        StringBuilder helpMessageBuilder = new StringBuilder("I can help you connect to a remote PostgreSQL database and retrieve data from it.\n");
+        StringBuilder helpMessageBuilder = new StringBuilder("<b>Help</b>\n\n");
+        helpMessageBuilder.append("I can help you connect to a remote PostgreSQL database and retrieve data from it.\n");
         helpMessageBuilder.append("You can control me by sending these commands:\n\n");
         for (ICommand command : registry.getCommands()) {
             helpMessageBuilder.append(command.toString()).append("\n\n");
