@@ -41,30 +41,32 @@ public class Bot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        var message = update.getMessage();
-        var userId = message.getFrom().getId();
-        initUserSettingsIfNeeded(userId);
-        if (update.hasCallbackQuery()) {
+        if (update.hasCallbackQuery()) { // user pressed a button on an inline keyboard
             callbackRegistry.executeCallback(this, update.getCallbackQuery());
             return;
         }
-        if (message.isCommand()) {
-            var status = commandRegistry.executeCommand(this, message);
-            if (status == BotStatus.NO_SUCH_COMMAND) {
-                executeDefaultAction(message);
-                status = BotStatus.DEFAULT;
+        if (update.hasMessage() && update.getMessage().hasText()) {
+            var message = update.getMessage();
+            var userId = message.getFrom().getId();
+            initUserSettingsIfNeeded(userId);
+            if (message.isCommand()) {
+                var status = commandRegistry.executeCommand(this, message);
+                if (status == BotStatus.NO_SUCH_COMMAND) {
+                    executeDefaultAction(message);
+                    status = BotStatus.DEFAULT;
+                }
+                userSettings.get(userId).setBotStatus(status);
+                return;
             }
-            userSettings.get(userId).setBotStatus(status);
-            return;
+            // handle user text message if waiting for some sort of information
+            if (userSettings.get(userId).getBotStatus() != BotStatus.DEFAULT) {
+                var status = responseRegistry.executeResponse(this, message, userSettings.get(userId).getBotStatus());
+                userSettings.get(userId).setBotStatus(status);
+                return;
+            }
+            // If incoming message is not a command and is not an expected text answer, execute default action
+            executeDefaultAction(message);
         }
-        // handle user text message if waiting for some sort of information
-        if (userSettings.get(userId).getBotStatus() != BotStatus.DEFAULT) {
-            var status = responseRegistry.executeResponse(this, message, userSettings.get(userId).getBotStatus());
-            userSettings.get(userId).setBotStatus(status);
-            return;
-        }
-        // If incoming message is not a command and is not an expected text answer, execute default action
-        executeDefaultAction(message);
     }
 
     public UserSettings getUserSettings(Long userId) {

@@ -25,15 +25,17 @@ public class BatchDispatcher {
     public String getNextBatch() {
         if (currentBatch < maxBatchCount - 1) {
             currentBatch++;
+            return getBatchByNumber(currentBatch);
         }
-        return getBatchByNumber(currentBatch);
+        return null;
     }
 
     public String getPrevBatch() {
         if (currentBatch > 0) {
             currentBatch--;
+            return getBatchByNumber(currentBatch);
         }
-        return getBatchByNumber(currentBatch);
+        return null;
     }
 
     private String getHeaderRow() {
