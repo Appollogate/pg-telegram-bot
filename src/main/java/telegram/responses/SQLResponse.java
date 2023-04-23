@@ -1,12 +1,19 @@
 package telegram.responses;
 
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import org.telegram.telegrambots.meta.bots.AbsSender;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import postgres.PGController;
 import telegram.Bot;
 import telegram.settings.BotStatus;
 import telegram.settings.UserSettings;
 import utility.BatchDispatcher;
 import utility.PGTelegramBotException;
+
+import java.util.List;
 
 // todo: rename to QueryResponse
 public class SQLResponse extends Response {
@@ -51,7 +58,6 @@ public class SQLResponse extends Response {
         try {
             var result = pgController.executeSQLQuery(sqlQuery);
             var batchDispatcher = new BatchDispatcher(result, BATCH_SIZE, true, true);
-            // todo: override sendMessage to include left/right buttons to switch batches
             Message sentMessage = sendMessage(bot, chatId, batchDispatcher.getCurrentBatch());
             // save BatchDispatcher for this specific message
             bot.setBatchDispatcherForMessage(sentMessage.getMessageId(), sentMessage.getChat().getId(), batchDispatcher);
@@ -59,5 +65,31 @@ public class SQLResponse extends Response {
             sendMessage(bot, chatId, e.getMessage());
             System.err.println(e.getCause().getMessage());
         }
+    }
+
+    @Override
+    Message sendMessage(AbsSender absSender, Long chatId, String message) {
+        SendMessage sendMessage = SendMessage.builder()
+                .chatId(chatId)
+                .text(message)
+                .replyMarkup(getKeyboard())
+                .build();
+        try {
+            return absSender.execute(sendMessage);
+        } catch (TelegramApiException e) {
+            // todo: handle better
+            System.err.println(e.getMessage());
+            return null;
+        }
+    }
+
+    private InlineKeyboardMarkup getKeyboard() {
+        var backButton = InlineKeyboardButton.builder()
+                .text("Back").callbackData("back") // show previous batch of query results
+                .build();
+        var nextButton = InlineKeyboardButton.builder()
+                .text("Next").callbackData("next") // show next batch of query results
+                .build();
+        return InlineKeyboardMarkup.builder().keyboardRow(List.of(backButton, nextButton)).build();
     }
 }

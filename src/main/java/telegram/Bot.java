@@ -7,6 +7,9 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import java.util.HashMap;
 import java.util.Map;
 
+import telegram.callbacks.BackCallback;
+import telegram.callbacks.CallbackRegistry;
+import telegram.callbacks.NextCallback;
 import telegram.commands.*;
 import telegram.responses.*;
 import telegram.settings.BotStatus;
@@ -19,14 +22,16 @@ public class Bot extends TelegramLongPollingBot {
     private final Map<Long, UserSettings> userSettings = new HashMap<>();
     private final CommandRegistry commandRegistry = new CommandRegistry();
     private final ResponseRegistry responseRegistry = new ResponseRegistry();
+    private final CallbackRegistry callbackRegistry = new CallbackRegistry();
     // todo: store this in a database
     // maps message id + chat id to a batch dispatcher that holds retrieved query
-    private Map<Pair<Integer, Long>, BatchDispatcher> batchDispatcherMap = new HashMap<>();
+    private final Map<Pair<Integer, Long>, BatchDispatcher> batchDispatcherMap = new HashMap<>();
 
     public Bot(String botToken) {
         super(botToken);
         fillCommandRegistry();
         fillResponseRegistry();
+        fillCallbackRegistry();
     }
 
     @Override
@@ -40,7 +45,7 @@ public class Bot extends TelegramLongPollingBot {
         var userId = message.getFrom().getId();
         initUserSettingsIfNeeded(userId);
         if (update.hasCallbackQuery()) {
-            // todo: handle inline keyboard
+            callbackRegistry.executeCallback(this, update.getCallbackQuery());
             return;
         }
         if (message.isCommand()) {
@@ -76,6 +81,19 @@ public class Bot extends TelegramLongPollingBot {
         }
     }
 
+    public BatchDispatcher getBatchDispatcherByMessage(Integer messageId, Long chatId) {
+        var pair = new Pair<Integer, Long>(messageId, chatId);
+        if (batchDispatcherMap.containsKey(pair)) {
+            return batchDispatcherMap.get(pair);
+        }
+        // if we got here, something went wrong
+        System.err.println
+                ("Bot.getBatchDispatcherByMessage: couldn't get batch dispatcher." +
+                "\nmessageId = " + messageId +
+                "\nchatId = " + chatId);
+        return null;
+    }
+
     private void fillCommandRegistry() {
         commandRegistry.addCommand(new HostCommand());
         commandRegistry.addCommand(new PortCommand());
@@ -93,6 +111,11 @@ public class Bot extends TelegramLongPollingBot {
         responseRegistry.addResponse(BotStatus.AWAITING_USERNAME, new SetUsernameResponse());
         responseRegistry.addResponse(BotStatus.AWAITING_PASSWORD, new SetPasswordResponse());
         responseRegistry.addResponse(BotStatus.AWAITING_SQL_QUERY, new SQLResponse());
+    }
+
+    private void fillCallbackRegistry() {
+        callbackRegistry.addCallback("back", new BackCallback());
+        callbackRegistry.addCallback("next", new NextCallback());
     }
 
     private void initUserSettingsIfNeeded(Long userId) {
