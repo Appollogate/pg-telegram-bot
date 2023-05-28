@@ -12,13 +12,13 @@ public class SetPortResponse extends Response {
             port = Integer.parseInt(message.getText());
         }
         catch (NumberFormatException e) {
-            sendMessage(bot, message.getChat().getId(), "Expected a numeric value as port number, please try again.");
+            sendMessage(bot, message.getChat().getId(), "В качестве порта ожидалось целое положительное число. Пожалуйста, попробуйте ещё раз.");
             return BotStatus.AWAITING_PORT;
         }
         var userId = message.getFrom().getId();
         bot.getUserSettings(userId).setPort(port);
         sendMessage(bot, message.getChat().getId(),
-                "Success! Set port as " + bot.getUserSettings(userId).getPort() + ".");
+                "Порт успешно сохранён как " + bot.getUserSettings(userId).getPort() + ".");
         return BotStatus.DEFAULT;
     }
 }

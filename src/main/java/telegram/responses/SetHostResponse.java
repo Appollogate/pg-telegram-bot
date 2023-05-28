@@ -12,7 +12,7 @@ public class SetHostResponse extends Response {
         var userId = message.getFrom().getId();
         bot.getUserSettings(userId).setHost(host);
         sendMessage(bot, message.getChat().getId(),
-                "Success! Set host as " + bot.getUserSettings(userId).getHost() + ".");
+                "Хост успешно сохранён как " + bot.getUserSettings(userId).getHost() + ".");
         return BotStatus.DEFAULT;
     }
 }

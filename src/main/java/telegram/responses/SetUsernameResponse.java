@@ -11,7 +11,7 @@ public class SetUsernameResponse extends Response {
         var userId = message.getFrom().getId();
         bot.getUserSettings(userId).setUsername(username);
         sendMessage(bot, message.getChat().getId(),
-                "Success! Set username as " + bot.getUserSettings(userId).getUsername() + ".");
+                "Имя пользователя успешно сохранено как " + bot.getUserSettings(userId).getUsername() + ".");
         return BotStatus.DEFAULT;
     }
 }

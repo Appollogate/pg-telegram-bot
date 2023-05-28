@@ -9,7 +9,7 @@ public class SetPasswordResponse extends Response {
         var password = message.getText();
         var userId = message.getFrom().getId();
         bot.getUserSettings(userId).setPassword(password);
-        sendMessage(bot, message.getChat().getId(), "Success! Your password was saved.");
+        sendMessage(bot, message.getChat().getId(), "Пароль успешно сохранён.");
         return BotStatus.DEFAULT;
     }
 }

@@ -61,7 +61,7 @@ public class BatchDispatcher {
             }
         }
         if (showBatchNumber) {
-            sb.append("\n(").append(currentBatch + 1).append(" batch out of ").append(maxBatchCount).append(")");
+            sb.append("\n(").append(currentBatch + 1).append(" страница из ").append(maxBatchCount).append(")");
         }
         return sb.toString();
     }

@@ -15,7 +15,6 @@ import utility.PGTelegramBotException;
 
 import java.util.List;
 
-// todo: rename to QueryResponse
 public class SQLResponse extends Response {
 
     static final Integer BATCH_SIZE = 5;
@@ -27,13 +26,13 @@ public class SQLResponse extends Response {
         UserSettings userSettings = bot.getUserSettings(userId);
         if (isAnyConnectionParamMissing(userSettings)) {
             sendMessage(bot, chatId, """
-                    Some connection parameters are missing! Please ensure that you've set all of the following parameters:
+                    Некоторые параметры подключения отсутствуют! Пожалуйста, убедитесь, что вы предоставили все нижеперечисленные параметры:
 
-                    - host name
-                    - port name
-                    - database name
-                    - username
-                    - password""");
+                    - имя (IP-адрес) хоста
+                    - номер порта
+                    - название базы данных
+                    - имя пользователя
+                    - пароль""");
             return BotStatus.DEFAULT;
         }
         runQuery(message.getText(), userSettings, bot, chatId);
@@ -85,10 +84,10 @@ public class SQLResponse extends Response {
 
     private InlineKeyboardMarkup getKeyboard() {
         var backButton = InlineKeyboardButton.builder()
-                .text("Back").callbackData("back") // show previous batch of query results
+                .text("Назад").callbackData("back") // show previous batch of query results
                 .build();
         var nextButton = InlineKeyboardButton.builder()
-                .text("Next").callbackData("next") // show next batch of query results
+                .text("Вперёд").callbackData("next") // show next batch of query results
                 .build();
         return InlineKeyboardMarkup.builder().keyboardRow(List.of(backButton, nextButton)).build();
     }

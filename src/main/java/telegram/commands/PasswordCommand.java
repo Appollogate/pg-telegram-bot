@@ -6,12 +6,12 @@ import telegram.settings.BotStatus;
 
 public class PasswordCommand extends Command {
     public PasswordCommand() {
-        super("setpassword", "set postgres password");
+        super("setpassword", "задать пароль пользователя, под которым осуществляется подключение");
     }
 
     @Override
     public BotStatus execute(AbsSender absSender, Chat chat) {
-        sendMessage(absSender, chat.getId(), "Send me the password which will be used for connection.");
+        sendMessage(absSender, chat.getId(), "Отправьте мне пароль пользователя, под которым будет установлено подключение к серверу.");
         return BotStatus.AWAITING_PASSWORD;
     }
 }

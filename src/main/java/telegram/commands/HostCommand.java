@@ -7,12 +7,12 @@ import telegram.settings.BotStatus;
 public class HostCommand extends Command {
 
     public HostCommand() {
-        super("sethost", "set host name of the server");
+        super("sethost", "задать хост сервера");
     }
 
     @Override
     public BotStatus execute(AbsSender absSender, Chat chat) {
-        sendMessage(absSender, chat.getId(), "Send me the host name of the server.");
+        sendMessage(absSender, chat.getId(), "Отправьте мне хост (IP-адрес) сервера.");
         return BotStatus.AWAITING_HOST;
     }
 }

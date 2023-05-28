@@ -11,7 +11,7 @@ public class SetDBNameResponse extends Response {
         var userId = message.getFrom().getId();
         bot.getUserSettings(userId).setDbName(dbName);
         sendMessage(bot, message.getChat().getId(),
-                "Success! Set database name as " + bot.getUserSettings(userId).getDbName() + ".");
+                "Название базы данных успешно сохранено как " + bot.getUserSettings(userId).getDbName() + ".");
         return BotStatus.DEFAULT;
     }
 }

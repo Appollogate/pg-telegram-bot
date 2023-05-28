@@ -8,15 +8,15 @@ public class HelpCommand extends Command {
 
     private final CommandRegistry registry;
     public HelpCommand(CommandRegistry registry) {
-        super("help", "list all available commands");
+        super("help", "перечислить все доступные команды");
         this.registry = registry;
     }
 
     @Override
     public BotStatus execute(AbsSender absSender, Chat chat) {
-        StringBuilder helpMessageBuilder = new StringBuilder("<b>Help</b>\n\n");
-        helpMessageBuilder.append("I can help you connect to a remote PostgreSQL database and retrieve data from it.\n");
-        helpMessageBuilder.append("You can control me by sending these commands:\n\n");
+        StringBuilder helpMessageBuilder = new StringBuilder("<b>Справка</b>\n\n");
+        helpMessageBuilder.append("Я - бот, способный подключаться к удаленной СУБД PostgreSQL и получать от неё данные через SQL-запросы.\n");
+        helpMessageBuilder.append("Вы можете управлять мной с помощью следующих команд:\n\n");
         for (ICommand command : registry.getCommands()) {
             helpMessageBuilder.append(command.toString()).append("\n\n");
         }

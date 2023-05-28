@@ -6,12 +6,12 @@ import telegram.settings.BotStatus;
 
 public class UserNameCommand extends Command {
     public UserNameCommand() {
-        super("setusername", "set postgres username");
+        super("setusername", "задать имя пользователя");
     }
 
     @Override
     public BotStatus execute(AbsSender absSender, Chat chat) {
-        sendMessage(absSender, chat.getId(), "Send me the username which will be used for connection.");
+        sendMessage(absSender, chat.getId(), "Отправьте мне имя пользователя, используемое для подключения.");
         return BotStatus.AWAITING_USERNAME;
     }
 }

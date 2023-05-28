@@ -7,12 +7,12 @@ import telegram.settings.BotStatus;
 public class PortCommand extends Command {
 
     public PortCommand() {
-        super("setport", "set port number the server is listening on");
+        super("setport", "задать порт сервера");
     }
 
     @Override
     public BotStatus execute(AbsSender absSender, Chat chat) {
-        sendMessage(absSender, chat.getId(), "Send me the port number the Postgres server is listening on.");
+        sendMessage(absSender, chat.getId(), "Отправьте мне номер порта, который слушает PostgreSQL.");
         return BotStatus.AWAITING_PORT;
     }
 }

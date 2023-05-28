@@ -33,10 +33,10 @@ public interface IEditTextCallback extends ICallback {
     // todo: move to another class?
     private InlineKeyboardMarkup getKeyboard() {
         var backButton = InlineKeyboardButton.builder()
-                .text("Back").callbackData("back") // show previous batch of query results
+                .text("Назад").callbackData("back") // show previous batch of query results
                 .build();
         var nextButton = InlineKeyboardButton.builder()
-                .text("Next").callbackData("next") // show next batch of query results
+                .text("Вперёд").callbackData("next") // show next batch of query results
                 .build();
         return InlineKeyboardMarkup.builder().keyboardRow(List.of(backButton, nextButton)).build();
     }
