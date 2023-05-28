@@ -25,7 +25,7 @@ public class SQLResponse extends Response {
         var chatId = message.getChat().getId();
         UserSettings userSettings = bot.getUserSettings(userId);
         if (isAnyConnectionParamMissing(userSettings)) {
-            sendMessage(bot, chatId, """
+            super.sendMessage(bot, chatId, """
                     Некоторые параметры подключения отсутствуют! Пожалуйста, убедитесь, что вы предоставили все нижеперечисленные параметры:
 
                     - имя (IP-адрес) хоста
