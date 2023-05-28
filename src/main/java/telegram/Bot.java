@@ -104,6 +104,7 @@ public class Bot extends TelegramLongPollingBot {
         commandRegistry.addCommand(new PasswordCommand());
         commandRegistry.addCommand(new HelpCommand(commandRegistry));
         commandRegistry.addCommand(new SQLCommand());
+        commandRegistry.addCommand(new StartCommand());
     }
 
     private void fillResponseRegistry() {
